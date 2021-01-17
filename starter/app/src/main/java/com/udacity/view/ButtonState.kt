@@ -1,4 +1,4 @@
-package com.udacity
+package com.udacity.view
 
 
 sealed class ButtonState {
