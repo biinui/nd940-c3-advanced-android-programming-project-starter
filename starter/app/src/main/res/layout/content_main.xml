@@ -29,8 +29,7 @@
             android:id="@+id/picasso_radiobutton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/picasso_image_loading_library_by_square"
-             />
+            android:text="@string/picasso_image_loading_library_by_square" />
 
         <RadioButton
             android:id="@+id/loadapp_radiobutton"
