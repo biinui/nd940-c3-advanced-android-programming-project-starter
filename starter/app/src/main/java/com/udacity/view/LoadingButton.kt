@@ -19,17 +19,29 @@ class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
     private var progress = 0
-    private var widthSize = 0
-    private var heightSize = 0
+    private var loadingButtonWidth = 0F
+    private var widthSize = 0F
+    private var heightSize = 0F
 
     private val downloadTextPosition = PointF(0.0f, 0.0f)
     private val downloadTextString = context.getString(R.string.download)
 
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 55.0f
         typeface = Typeface.create("", Typeface.BOLD)
+        color = Color.WHITE
+    }
+
+    private val downloadButtonPaint = Paint(textPaint).apply {
+        color = context.getColor(R.color.colorPrimary)
+    }
+    private val loadingButtonPaint = Paint(textPaint).apply {
+        color = context.getColor(R.color.colorPrimaryDark)
+    }
+    private val loadingCirclePaint = Paint(textPaint).apply {
+        color = context.getColor(R.color.colorAccent)
     }
 
     private val valueAnimator = ValueAnimator()
@@ -52,13 +64,17 @@ class LoadingButton @JvmOverloads constructor(
             interpolator = DecelerateInterpolator()
             addUpdateListener {
                 progress = it.animatedValue as Int
+                calculateLoadingButton()
+                calculateLoadingCircle()
                 invalidate()
             }
 
             doOnEnd {
                 scope.launch {
-                    delay(500)
+                    delay(888)
                     progress = 0
+                    calculateLoadingButton()
+                    calculateLoadingCircle()
                     invalidate()
                 }
             }
@@ -79,33 +95,40 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     private fun drawDownloadButton(canvas: Canvas?) {
-        paint.color = context.getColor(R.color.colorPrimary)
-        canvas?.drawRect(0F, 0F, widthSize.toFloat(), heightSize.toFloat(), paint)
+        canvas?.drawRect(0F, 0F, widthSize, heightSize, downloadButtonPaint)
+        canvas?.drawText(downloadTextString, downloadTextPosition.x, downloadTextPosition.y, textPaint)
+    }
 
-        paint.color = Color.WHITE
-        canvas?.drawText(downloadTextString, downloadTextPosition.x, downloadTextPosition.y, paint)
+    private fun calculateLoadingButton() {
+        loadingButtonWidth = widthSize * (progress / 100F)
     }
 
     private fun drawLoadingButton(canvas: Canvas?) {
-        paint.color = context.getColor(R.color.colorPrimaryDark)
+        canvas?.drawRect(0F, 0F, loadingButtonWidth, heightSize, loadingButtonPaint)
+    }
 
-        val progressWidth = widthSize * (progress / 100F)
-        canvas?.drawRect(0F, 0F, progressWidth, heightSize.toFloat(), paint)
+    private var progressAngle = 0F
+    private val radius = 48
+    private val diameter = radius * 2
+    private var loadingCircleLeft = 48F
+    private var loadingCircleTop = 48F
+    private var loadingCircleRight = 48F
+    private var loadingCircleBottom = 48F
+    private val margin = 16F
+
+    private fun calculateLoadingCircle() {
+        progressAngle = 360 * (progress / 100F)
+    }
+
+    private fun setLoadingCirclePosition() {
+        loadingCircleLeft = widthSize - diameter - margin
+        loadingCircleTop = (heightSize / 2) - radius
+        loadingCircleRight = loadingCircleLeft + diameter
+        loadingCircleBottom = loadingCircleTop + diameter
     }
 
     private fun drawLoadingCircle(canvas: Canvas?) {
-        paint.color = context.getColor(R.color.colorAccent)
-
-        val progressAngle = 360 * (progress / 100F)
-        val radius = 48
-        val diameter = radius * 2
-        val margin = 16
-        val left = widthSize - diameter - margin
-        val top = (heightSize - diameter + margin) / 2
-        canvas?.drawArc(
-            left.toFloat(), top.toFloat(),
-            (left + diameter).toFloat(), (top + diameter).toFloat(), 0F, progressAngle, true, paint
-        )
+        canvas?.drawArc(loadingCircleLeft, loadingCircleTop, loadingCircleRight, loadingCircleBottom, 0F, progressAngle, true, loadingCirclePaint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -113,12 +136,14 @@ class LoadingButton @JvmOverloads constructor(
         val w: Int = resolveSizeAndState(minw, widthMeasureSpec, 1)
         val h: Int = resolveSizeAndState(MeasureSpec.getSize(w), heightMeasureSpec, 0)
 
-        widthSize = w
-        heightSize = h
+        widthSize = w.toFloat()
+        heightSize = h.toFloat()
         setMeasuredDimension(w, h)
 
         downloadTextPosition.x = w.toFloat() / 2
         downloadTextPosition.y = h.toFloat() / 2
+
+        setLoadingCirclePosition()
     }
 
     override fun performClick(): Boolean {

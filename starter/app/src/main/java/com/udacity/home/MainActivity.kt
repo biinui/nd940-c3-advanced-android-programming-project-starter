@@ -1,21 +1,27 @@
 package com.udacity.home
 
 import android.app.DownloadManager
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.RadioButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.udacity.R
 import com.udacity.databinding.ActivityMainBinding
+import com.udacity.util.sendNotification
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import timber.log.Timber
@@ -31,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var  binding: ActivityMainBinding
 
-    private var urlToDownload = UDACITY_URL
+    private var urlToDownload = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,9 +48,17 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         download_button.setOnClickListener {
-            download()
+            if (urlToDownload.isEmpty()) {
+                Toast.makeText(applicationContext, R.string.please_select_an_option, Toast.LENGTH_SHORT).show()
+            } else {
+                download()
+            }
         }
 
+        createChannel(
+            getString(R.string.download_notification_channel_id),
+            getString(R.string.download_notification_channel_name)
+        )
     }
 
     fun onDownloadOptionClicked(view: View) {
@@ -73,6 +87,8 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             Timber.i("downloadDone: $id")
+            val notificationManager = ContextCompat.getSystemService(applicationContext, NotificationManager::class.java) as NotificationManager
+            notificationManager.sendNotification(applicationContext.getText(R.string.notification_description).toString(), applicationContext)
         }
     }
 
@@ -87,6 +103,31 @@ class MainActivity : AppCompatActivity() {
         val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadID = downloadManager.enqueue(request)// enqueue puts the download request in the queue.
         Timber.i("downloadRequested: $downloadID")
+    }
+
+    private fun createChannel(channelId: String, channelName: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+                .apply {
+                    setShowBadge(false)
+                }
+
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = getString(R.string.notification_description)
+
+            val notificationManager = ContextCompat.getSystemService(
+                applicationContext,
+                NotificationManager::class.java
+            ) as NotificationManager
+            notificationManager.createNotificationChannel(notificationChannel)
+
+        }
     }
 
     companion object {

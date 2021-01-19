@@ -19,6 +19,9 @@
     <string name="status">Status:</string>
     <string name="success">Success</string>
 
-    <string name="download_notification_channel_id" translatable="false">Download Notification Channel ID</string>
+    <string name="download_notification_channel_id" translatable="false">download_channel</string>
+    <string name="download_notification_channel_name">Download Channel</string>
     <string name="dismiss">Dismiss</string>
+
+    <string name="please_select_an_option">Please select an option.</string>
 </resources>
