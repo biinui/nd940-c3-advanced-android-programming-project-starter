@@ -5,11 +5,15 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.LinearInterpolator
+import android.view.animation.DecelerateInterpolator
+import androidx.core.animation.doOnEnd
 import com.udacity.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.properties.Delegates
-
 
 class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -34,21 +38,33 @@ class LoadingButton @JvmOverloads constructor(
 
     }
 
+    private val scope = CoroutineScope(Dispatchers.Default)
+
     init {
         this.isClickable = true
     }
 
     private fun onStartProgressAnimation() {
         Timber.i("onStartProgressAnimation")
-        valueAnimator.setIntValues(0, 100)
-        valueAnimator.duration = 2500
-        valueAnimator.interpolator = LinearInterpolator()
-        valueAnimator.addUpdateListener {
-            progress = it.animatedValue as Int
-            Timber.i("progress: $progress")
-            invalidate()
+        valueAnimator.apply {
+            setIntValues(0, 100)
+            duration = 2500
+            interpolator = DecelerateInterpolator()
+            addUpdateListener {
+                progress = it.animatedValue as Int
+                invalidate()
+            }
+
+            doOnEnd {
+                scope.launch {
+                    delay(500)
+                    progress = 0
+                    invalidate()
+                }
+            }
+
+            start()
         }
-        valueAnimator.start()
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -57,21 +73,39 @@ class LoadingButton @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
+        drawDownloadButton(canvas)
+        drawLoadingButton(canvas)
+        drawLoadingCircle(canvas)
+    }
+
+    private fun drawDownloadButton(canvas: Canvas?) {
         paint.color = context.getColor(R.color.colorPrimary)
         canvas?.drawRect(0F, 0F, widthSize.toFloat(), heightSize.toFloat(), paint)
 
         paint.color = Color.WHITE
         canvas?.drawText(downloadTextString, downloadTextPosition.x, downloadTextPosition.y, paint)
-
-        drawLoading(canvas)
     }
 
-    private fun drawLoading(canvas: Canvas?) {
+    private fun drawLoadingButton(canvas: Canvas?) {
         paint.color = context.getColor(R.color.colorPrimaryDark)
 
         val progressWidth = widthSize * (progress / 100F)
-        Timber.i("progressWidth: $progressWidth")
         canvas?.drawRect(0F, 0F, progressWidth, heightSize.toFloat(), paint)
+    }
+
+    private fun drawLoadingCircle(canvas: Canvas?) {
+        paint.color = context.getColor(R.color.colorAccent)
+
+        val progressAngle = 360 * (progress / 100F)
+        val radius = 48
+        val diameter = radius * 2
+        val margin = 16
+        val left = widthSize - diameter - margin
+        val top = (heightSize - diameter + margin) / 2
+        canvas?.drawArc(
+            left.toFloat(), top.toFloat(),
+            (left + diameter).toFloat(), (top + diameter).toFloat(), 0F, progressAngle, true, paint
+        )
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

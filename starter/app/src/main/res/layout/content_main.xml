@@ -1,58 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".home.MainActivity"
-    tools:showIn="@layout/activity_main">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <ImageView
-        android:id="@+id/download_image_id"
-        android:layout_width="0dp"
-        android:layout_height="200dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context=".home.MainActivity"
+        tools:showIn="@layout/activity_main">
 
-    <RadioGroup
-        android:id="@+id/download_option_radiogroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/download_image_id">
+        <ImageView
+            android:id="@+id/download_image_id"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <RadioButton
-            android:id="@+id/picasso_radiobutton"
-            android:layout_width="match_parent"
+        <RadioGroup
+            android:id="@+id/download_option_radiogroup"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/picasso_image_loading_library_by_square" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/download_image_id">
 
-        <RadioButton
-            android:id="@+id/loadapp_radiobutton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/loadapp_current_repository_by_udacity" />
+            <RadioButton
+                android:id="@+id/picasso_radiobutton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDownloadOptionClicked"
+                android:text="@string/picasso_image_loading_library_by_square" />
 
-        <RadioButton
-            android:id="@+id/retrofit_radiobutton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/retrofit_type_safe_http_client_for_andoird_and_java_by_square" />
+            <RadioButton
+                android:id="@+id/loadapp_radiobutton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDownloadOptionClicked"
+                android:text="@string/loadapp_current_repository_by_udacity" />
 
-    </RadioGroup>
+            <RadioButton
+                android:id="@+id/retrofit_radiobutton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDownloadOptionClicked"
+                android:text="@string/retrofit_type_safe_http_client_for_andoird_and_java_by_square" />
 
-    <com.udacity.view.LoadingButton
-        android:id="@+id/download_button"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_margin="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/download_option_radiogroup" />
+        </RadioGroup>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.udacity.view.LoadingButton
+            android:id="@+id/download_button"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_margin="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/download_option_radiogroup" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
