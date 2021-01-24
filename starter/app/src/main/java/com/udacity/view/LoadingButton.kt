@@ -25,6 +25,7 @@ class LoadingButton @JvmOverloads constructor(
 
     private val downloadTextPosition = PointF(0.0f, 0.0f)
     private val downloadTextString = context.getString(R.string.download)
+    private val loadingTextString = context.getString(R.string.button_loading)
 
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -47,7 +48,7 @@ class LoadingButton @JvmOverloads constructor(
     private val valueAnimator = ValueAnimator()
 
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
-
+        Timber.i("$p, $old, $new")
     }
 
     private val scope = CoroutineScope(Dispatchers.Default)
@@ -105,6 +106,7 @@ class LoadingButton @JvmOverloads constructor(
 
     private fun drawLoadingButton(canvas: Canvas?) {
         canvas?.drawRect(0F, 0F, loadingButtonWidth, heightSize, loadingButtonPaint)
+        canvas?.drawText(loadingTextString, downloadTextPosition.x, downloadTextPosition.y, textPaint)
     }
 
     private var progressAngle = 0F
