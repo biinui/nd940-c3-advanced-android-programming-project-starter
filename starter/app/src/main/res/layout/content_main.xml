@@ -17,7 +17,9 @@
             android:layout_height="200dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/ic_download_foreground"
+            android:contentDescription="@string/ic_download_content_description"/>
 
         <RadioGroup
             android:id="@+id/download_option_radiogroup"
