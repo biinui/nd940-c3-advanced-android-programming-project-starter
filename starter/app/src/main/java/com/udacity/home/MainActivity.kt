@@ -22,6 +22,7 @@ import androidx.databinding.DataBindingUtil
 import com.udacity.R
 import com.udacity.databinding.ActivityMainBinding
 import com.udacity.util.sendNotification
+import com.udacity.view.ButtonState
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import timber.log.Timber
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
             if (urlToDownload.isEmpty()) {
                 Toast.makeText(applicationContext, R.string.please_select_an_option, Toast.LENGTH_SHORT).show()
             } else {
+                download_button.buttonState = ButtonState.Loading
                 download()
             }
         }
@@ -88,7 +90,8 @@ class MainActivity : AppCompatActivity() {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             Timber.i("downloadDone: $id")
             val notificationManager = ContextCompat.getSystemService(applicationContext, NotificationManager::class.java) as NotificationManager
-            notificationManager.sendNotification(applicationContext.getText(R.string.notification_description).toString(), applicationContext)
+            notificationManager.sendNotification(applicationContext.getText(R.string.notification_description).toString(), applicationContext.getText(R.string.success).toString(), applicationContext)
+            download_button.buttonState = ButtonState.Completed
         }
     }
 

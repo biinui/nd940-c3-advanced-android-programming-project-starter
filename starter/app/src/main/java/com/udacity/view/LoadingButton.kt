@@ -6,12 +6,10 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import androidx.core.animation.doOnEnd
 import com.udacity.R
+import kotlinx.android.synthetic.main.content_detail.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.properties.Delegates
 
@@ -47,21 +45,32 @@ class LoadingButton @JvmOverloads constructor(
 
     private val valueAnimator = ValueAnimator()
 
-    private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
-        Timber.i("$p, $old, $new")
+    var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
+        if (old == new) return@observable
+
+        when(buttonState) {
+            ButtonState.Loading -> valueAnimator.start()
+            else -> {
+                valueAnimator.cancel()
+                invalidate()
+            }
+        }
     }
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
     init {
         this.isClickable = true
+        initValueAnimator()
     }
 
-    private fun onStartProgressAnimation() {
+    private fun initValueAnimator() {
         Timber.i("onStartProgressAnimation")
         valueAnimator.apply {
             setIntValues(0, 100)
-            duration = 2500
+            duration = 3000
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.RESTART
             interpolator = DecelerateInterpolator()
             addUpdateListener {
                 progress = it.animatedValue as Int
@@ -69,18 +78,6 @@ class LoadingButton @JvmOverloads constructor(
                 calculateLoadingCircle()
                 invalidate()
             }
-
-            doOnEnd {
-                scope.launch {
-                    delay(888)
-                    progress = 0
-                    calculateLoadingButton()
-                    calculateLoadingCircle()
-                    invalidate()
-                }
-            }
-
-            start()
         }
     }
 
@@ -90,9 +87,13 @@ class LoadingButton @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        drawDownloadButton(canvas)
-        drawLoadingButton(canvas)
-        drawLoadingCircle(canvas)
+        when(buttonState) {
+            ButtonState.Loading -> {
+                drawLoadingButton(canvas)
+                drawLoadingCircle(canvas)
+            }
+            else -> drawDownloadButton(canvas)
+        }
     }
 
     private fun drawDownloadButton(canvas: Canvas?) {
@@ -105,6 +106,7 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     private fun drawLoadingButton(canvas: Canvas?) {
+        canvas?.drawRect(0F, 0F, widthSize, heightSize, downloadButtonPaint)
         canvas?.drawRect(0F, 0F, loadingButtonWidth, heightSize, loadingButtonPaint)
         canvas?.drawText(loadingTextString, downloadTextPosition.x, downloadTextPosition.y, textPaint)
     }
@@ -146,13 +148,5 @@ class LoadingButton @JvmOverloads constructor(
         downloadTextPosition.y = h.toFloat() / 2
 
         setLoadingCirclePosition()
-    }
-
-    override fun performClick(): Boolean {
-        super.performClick()
-        Timber.i("performClick")
-        onStartProgressAnimation()
-
-        return true
     }
 }

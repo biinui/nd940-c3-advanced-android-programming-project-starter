@@ -7,28 +7,21 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.udacity.detail.DetailActivity
 import com.udacity.R
-import com.udacity.receiver.DismissReceiver
 
 private val NOTIFICATION_ID = 0
 private val REQUEST_CODE = 0
-private val FLAGS = 0
 
-fun NotificationManager.sendNotification(messageBody: String, applicationContext: Context) {
+fun NotificationManager.sendNotification(messageBody: String, status: String, applicationContext: Context) {
 
-    val contentIntent = Intent(applicationContext, DetailActivity::class.java)
-    val contentPendingIntent = PendingIntent.getActivity(
-        applicationContext,
-        NOTIFICATION_ID,
-        contentIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT
-    )
-
-    val dismissIntent = Intent(applicationContext, DismissReceiver::class.java)
-    val dismissPendingIntent: PendingIntent = PendingIntent.getBroadcast(
+    val seeDetailsIntent = Intent(applicationContext, DetailActivity::class.java)
+    seeDetailsIntent.putExtra(applicationContext.getString(R.string.file_name), messageBody)
+    seeDetailsIntent.putExtra(applicationContext.getString(R.string.status), status)
+    val seeDetailsPendingIntent: PendingIntent = PendingIntent.getActivity(
         applicationContext,
         REQUEST_CODE,
-        dismissIntent,
-        FLAGS)
+        seeDetailsIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT
+    )
 
     val builder = NotificationCompat.Builder(
         applicationContext,
@@ -39,13 +32,13 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         .setContentTitle(applicationContext.getString(R.string.notification_title))
         .setContentText(messageBody)
 
-        .setContentIntent(contentPendingIntent)
+        .setContentIntent(seeDetailsPendingIntent)
         .setAutoCancel(true)
 
         .addAction(
             R.drawable.ic_launcher_foreground,
-            applicationContext.getString(R.string.dismiss),
-            dismissPendingIntent
+            applicationContext.getString(R.string.see_details),
+            seeDetailsPendingIntent
         )
 
         .setPriority(NotificationCompat.PRIORITY_HIGH)

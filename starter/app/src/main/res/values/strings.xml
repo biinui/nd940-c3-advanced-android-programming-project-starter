@@ -8,7 +8,7 @@
     <string name="notification_button">See changes</string>
 
     <string name="button_name">Click me</string>
-    <string name="button_loading">We are loading </string>
+    <string name="button_loading">Downloading...</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="picasso_image_loading_library_by_square">Picasso - Image Loading Library by Square</string>
     <string name="loadapp_current_repository_by_udacity">LoadApp - Current Repository by Udacity</string>
@@ -21,7 +21,7 @@
 
     <string name="download_notification_channel_id" translatable="false">download_channel</string>
     <string name="download_notification_channel_name">Download Channel</string>
-    <string name="dismiss">Dismiss</string>
+    <string name="see_details">See Details</string>
 
     <string name="please_select_an_option">Please select an option.</string>
 </resources>
