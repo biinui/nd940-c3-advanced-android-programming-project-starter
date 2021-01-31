@@ -6,6 +6,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import androidx.core.content.withStyledAttributes
 import com.udacity.R
 import kotlinx.android.synthetic.main.content_detail.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -25,22 +26,27 @@ class LoadingButton @JvmOverloads constructor(
     private val downloadTextString = context.getString(R.string.download)
     private val loadingTextString = context.getString(R.string.button_loading)
 
+    private var defaultBackgroundColor = 0
+    private var loadingBackgroundColor = 0
+    private var loadingCircleColor = 0
+    private var defaultTextColor = 0
+
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 55.0f
         typeface = Typeface.create("", Typeface.BOLD)
-        color = Color.WHITE
+        color = defaultTextColor
     }
 
     private val downloadButtonPaint = Paint(textPaint).apply {
-        color = context.getColor(R.color.colorPrimary)
+        color = defaultBackgroundColor
     }
     private val loadingButtonPaint = Paint(textPaint).apply {
-        color = context.getColor(R.color.colorPrimaryDark)
+        color = loadingBackgroundColor
     }
     private val loadingCirclePaint = Paint(textPaint).apply {
-        color = context.getColor(R.color.colorAccent)
+        color = loadingCircleColor
     }
 
     private val valueAnimator = ValueAnimator()
@@ -62,6 +68,12 @@ class LoadingButton @JvmOverloads constructor(
     init {
         this.isClickable = true
         initValueAnimator()
+        context.withStyledAttributes(attrs, R.styleable.LoadingButton) {
+            defaultBackgroundColor = getColor(R.styleable.LoadingButton_defaultBackgroundColor, 0)
+            loadingBackgroundColor = getColor(R.styleable.LoadingButton_loadingBackgroundColor, 0)
+            loadingCircleColor = getColor(R.styleable.LoadingButton_loadingCircleColor, 0)
+            defaultTextColor = getColor(R.styleable.LoadingButton_defaultTextColor, 0)
+        }
     }
 
     private fun initValueAnimator() {
